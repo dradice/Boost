@@ -1,0 +1,8 @@
+# Configuration definitions for thorn HDF5
+
+PROVIDES BOOST
+{
+  SCRIPT BOOST.sh
+  LANG bash
+  OPTIONS BOOST_DIR
+}
