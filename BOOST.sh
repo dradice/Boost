@@ -48,68 +48,68 @@ fi
 # Build
 ################################################################################
 
-#if [ -z "${BOOST_DIR}" ]; then
-#    echo "BEGIN MESSAGE"
-#    echo "Building BOOST..."
-#    echo "END MESSAGE"
-#    
-#    # Set locations
-#    NAME=boost_1_45_0
-#    SRCDIR=$(dirname $0)
-#    INSTALL_DIR=${SCRATCH_BUILD}
-#    BOOST_DIR=${INSTALL_DIR}/${NAME}
-#    
-#    # Clean up environment
-#    unset LIBS
-#    unset MAKEFLAGS
-#    
-#(
-#    exec >&2                    # Redirect stdout to stderr
-#    set -x                      # Output commands
-#    set -e                      # Abort on errors
-#    cd ${INSTALL_DIR}
-#    if [ -e done-${NAME} -a done-${NAME} -nt ${SRCDIR}/dist/${NAME}.tar.gz \
-#                         -a done-${NAME} -nt ${SRCDIR}/BOOST.sh ]
-#    then
-#        echo "BOOST: The enclosed BOOST library has already been built; doing nothing"
-#    else
-#        echo "BOOST: Building enclosed BOOST library"
-#        
-#        echo "BOOST: Unpacking archive..."
-#        rm -rf build-${NAME}
-#        mkdir build-${NAME}
-#        pushd build-${NAME}
-#        # Should we use gtar or tar?
-#        TAR=$(gtar --help > /dev/null 2> /dev/null && echo gtar || echo tar)
-#        ${TAR} xzf ${SRCDIR}/dist/${NAME}.tar.gz
-#        popd
-#        
-#        echo "BOOST: Configuring..."
-#        rm -rf ${NAME}
-#        mkdir ${NAME}
-#        pushd build-${NAME}/${NAME}
-#        ./bootstrap.sh --prefix=${BOOST_DIR}
-#        
-#        echo "BOOST: Building..."
-#        ./bjam
-#        
-#        echo "BOOST: Installing..."
-#        ./bjam install
-#        popd
-#        
-#        echo 'done' > done-${NAME}
-#        echo "BOOST: Done."
-#    fi
-#)
-#    
-#    if (( $? )); then
-#        echo 'BEGIN ERROR'
-#        echo 'Error while building BOOST.  Aborting.'
-#        echo 'END ERROR'
-#        exit 1
-#    fi
-#    
-#fi
+if [ -z "${BOOST_DIR}" ]; then
+    echo "BEGIN MESSAGE"
+    echo "Building BOOST..."
+    echo "END MESSAGE"
+    
+    # Set locations
+    NAME=boost_1_45_0
+    SRCDIR=$(dirname $0)
+    INSTALL_DIR=${SCRATCH_BUILD}
+    BOOST_DIR=${INSTALL_DIR}/${NAME}
+    
+    # Clean up environment
+    unset LIBS
+    unset MAKEFLAGS
+    
+(
+    exec >&2                    # Redirect stdout to stderr
+    set -x                      # Output commands
+    set -e                      # Abort on errors
+    cd ${INSTALL_DIR}
+    if [ -e done-${NAME} -a done-${NAME} -nt ${SRCDIR}/dist/${NAME}.tar.gz \
+                         -a done-${NAME} -nt ${SRCDIR}/BOOST.sh ]
+    then
+        echo "BOOST: The enclosed BOOST library has already been built; doing nothing"
+    else
+        echo "BOOST: Building enclosed BOOST library"
+        
+        echo "BOOST: Unpacking archive..."
+        rm -rf build-${NAME}
+        mkdir build-${NAME}
+        pushd build-${NAME}
+        # Should we use gtar or tar?
+        TAR=$(gtar --help > /dev/null 2> /dev/null && echo gtar || echo tar)
+        ${TAR} xzf ${SRCDIR}/dist/${NAME}.tar.gz
+        popd
+        
+        echo "BOOST: Configuring..."
+        rm -rf ${NAME}
+        mkdir ${NAME}
+        pushd build-${NAME}/${NAME}
+        ./bootstrap.sh --prefix=${BOOST_DIR}
+        
+        echo "BOOST: Building..."
+        ./bjam
+        
+        echo "BOOST: Installing..."
+        ./bjam install
+        popd
+        
+        echo 'done' > done-${NAME}
+        echo "BOOST: Done."
+    fi
+)
+    
+    if (( $? )); then
+        echo 'BEGIN ERROR'
+        echo 'Error while building BOOST.  Aborting.'
+        echo 'END ERROR'
+        exit 1
+    fi
+    
+fi
 
 
 
@@ -119,11 +119,15 @@ fi
 
 # Set options
 BOOST_INC_DIRS="${BOOST_DIR}/include"
-BOOST_LIB_DIRS="${BOOST_DIR}/lib"
+
+if [ -d ${BOOST_DIR}/lib64 ]; then
+    BOOST_LIB_DIRS="${BOOST_DIR}/lib64"
+else
+    BOOST_LIB_DIRS="${BOOST_DIR}/lib"
+fi
+
 #BOOST_LIBS='boost'
-BOOST_LIBS=''
-
-
+#BOOST_LIBS="boost_date_time boost_filesystem boost_iostreams boost_prg_exec_monitor boost_program_options boost_python boost_regex boost_serialization boost_signals boost_test_exec_monitor boost_thread boost_unit_test_framework boost_wave boost_wserialization"
 
 # Check whether we are running on Windows
 if perl -we 'exit (`uname` =~ /^CYGWIN/)'; then
