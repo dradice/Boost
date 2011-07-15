@@ -5,7 +5,7 @@
 ################################################################################
 
 # Set up shell
-#set -x                          # Output commands
+set -x                          # Output commands
 set -e                          # Abort on errors
 
 
@@ -16,28 +16,31 @@ set -e                          # Abort on errors
 
 if [ -z "${BOOST_DIR}" ]; then
     echo "BEGIN MESSAGE"
-    echo "BOOST selected, but BOOST_DIR not set.  Checking some places..."
+    echo "Boost selected, but BOOST_DIR not set. Checking some places..."
     echo "END MESSAGE"
     
     FILES="include/boost/array.hpp"
     DIRS="/usr /usr/local /usr/local/boost /usr/local/packages/boost /usr/local/apps/boost ${HOME} c:/packages/boost"
-    for file in $FILES; do
-        for dir in $DIRS; do
-            if test -r "$dir/$file"; then
-                BOOST_DIR="$dir"
+    for dir in $DIRS; do
+        BOOST_DIR="$dir"
+        for file in $FILES; do
+            if [ ! -r "$dir/$file" ]; then
+                unset BOOST_DIR
                 break
             fi
         done
+        if [ -n "$BOOST_DIR" ]; then
+            break
+        fi
     done
     
     if [ -z "$BOOST_DIR" ]; then
         echo "BEGIN MESSAGE"
-        echo "BOOST not found"
-        exit 1
+        echo "Boost not found"
         echo "END MESSAGE"
     else
         echo "BEGIN MESSAGE"
-        echo "Found BOOST in ${BOOST_DIR}"
+        echo "Found Boost in ${BOOST_DIR}"
         echo "END MESSAGE"
     fi
 fi
@@ -50,61 +53,67 @@ fi
 
 if [ -z "${BOOST_DIR}" ]; then
     echo "BEGIN MESSAGE"
-    echo "Building BOOST..."
+    echo "Building Boost..."
     echo "END MESSAGE"
     
     # Set locations
+    THORN=Boost
     NAME=boost_1_45_0
     SRCDIR=$(dirname $0)
-    INSTALL_DIR=${SCRATCH_BUILD}
-    BOOST_DIR=${INSTALL_DIR}/${NAME}
-    
-    # Clean up environment
-    unset LIBS
-    unset MAKEFLAGS
+    BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
+    INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
+    DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
+    BOOST_DIR=${INSTALL_DIR}
     
 (
     exec >&2                    # Redirect stdout to stderr
     set -x                      # Output commands
     set -e                      # Abort on errors
-    cd ${INSTALL_DIR}
-    if [ -e done-${NAME} -a done-${NAME} -nt ${SRCDIR}/dist/${NAME}.tar.gz \
-                         -a done-${NAME} -nt ${SRCDIR}/BOOST.sh ]
+    cd ${SCRATCH_BUILD}
+    if [ -e ${DONE_FILE} -a ${DONE_FILE} -nt ${SRCDIR}/dist/${NAME}.tar.gz \
+                         -a ${DONE_FILE} -nt ${SRCDIR}/Boost.sh ]
     then
-        echo "BOOST: The enclosed BOOST library has already been built; doing nothing"
+        echo "Boost: The enclosed Boost library has already been built; doing nothing"
     else
-        echo "BOOST: Building enclosed BOOST library"
+        echo "Boost: Building enclosed Boost library"
         
-        echo "BOOST: Unpacking archive..."
-        rm -rf build-${NAME}
-        mkdir build-${NAME}
-        pushd build-${NAME}
-        # Should we use gtar or tar?
-        TAR=$(gtar --help > /dev/null 2> /dev/null && echo gtar || echo tar)
+        # Set up environment
+        unset LIBS
+        if echo '' ${ARFLAGS} | grep 64 > /dev/null 2>&1; then
+            export OBJECT_MODE=64
+        fi
+        
+        echo "Boost: Preparing directory structure..."
+        mkdir build external done 2> /dev/null || true
+        rm -rf ${BUILD_DIR} ${INSTALL_DIR}
+        mkdir ${BUILD_DIR} ${INSTALL_DIR}
+        
+        echo "Boost: Unpacking archive..."
+        pushd ${BUILD_DIR}
         ${TAR} xzf ${SRCDIR}/dist/${NAME}.tar.gz
-        popd
         
-        echo "BOOST: Configuring..."
-        rm -rf ${NAME}
-        mkdir ${NAME}
-        pushd build-${NAME}/${NAME}
+        echo "Boost: Configuring..."
+        cd ${NAME}
         ./bootstrap.sh --prefix=${BOOST_DIR}
         
-        echo "BOOST: Building..."
+        echo "Boost: Building..."
         ./bjam
         
-        echo "BOOST: Installing..."
+        echo "Boost: Installing..."
         ./bjam install
         popd
         
-        echo 'done' > done-${NAME}
-        echo "BOOST: Done."
+        echo "Boost: Cleaning up..."
+        rm -rf ${BUILD_DIR}
+        
+        date > ${DONE_FILE}
+        echo "Boost: Done."
     fi
 )
     
     if (( $? )); then
         echo 'BEGIN ERROR'
-        echo 'Error while building BOOST.  Aborting.'
+        echo 'Error while building Boost. Aborting.'
         echo 'END ERROR'
         exit 1
     fi
@@ -114,7 +123,7 @@ fi
 
 
 ################################################################################
-# Check for additional libraries
+# Configure Cactus
 ################################################################################
 
 # Set options
@@ -126,26 +135,8 @@ else
     BOOST_LIB_DIRS="${BOOST_DIR}/lib"
 fi
 
-#BOOST_LIBS='boost'
-#BOOST_LIBS="boost_date_time boost_filesystem boost_iostreams boost_prg_exec_monitor boost_program_options boost_python boost_regex boost_serialization boost_signals boost_test_exec_monitor boost_thread boost_unit_test_framework boost_wave boost_wserialization"
-
-# Check whether we are running on Windows
-if perl -we 'exit (`uname` =~ /^CYGWIN/)'; then
-    is_windows=0
-else
-    is_windows=1
-fi
-
-# Check whether we are running on MacOS
-if perl -we 'exit (`uname` =~ /^Darwin/)'; then
-    is_macos=0
-else
-    is_macos=1
-fi
-
-################################################################################
-# Configure Cactus
-################################################################################
+# BOOST_LIBS='boost'
+# BOOST_LIBS="boost_date_time boost_filesystem boost_iostreams boost_prg_exec_monitor boost_program_options boost_python boost_regex boost_serialization boost_signals boost_test_exec_monitor boost_thread boost_unit_test_framework boost_wave boost_wserialization"
 
 # Pass options to Cactus
 echo "BEGIN MAKE_DEFINITION"
