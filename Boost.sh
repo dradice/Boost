@@ -6,7 +6,7 @@
 
 # Set up shell
 set -x                          # Output commands
-set -e                          # Abort on errors
+#set -e                          # Abort on errors
 
 
 
@@ -58,7 +58,7 @@ if [ -z "${BOOST_DIR}" ]; then
     
     # Set locations
     THORN=Boost
-    NAME=boost_1_45_0
+    NAME=boost_1_47_0
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
@@ -97,10 +97,10 @@ if [ -z "${BOOST_DIR}" ]; then
         ./bootstrap.sh --prefix=${BOOST_DIR}
         
         echo "Boost: Building..."
-        ./bjam
+        ./b2
         
         echo "Boost: Installing..."
-        ./bjam install
+        ./b2 install
         popd
         
         echo "Boost: Cleaning up..."
@@ -111,12 +111,12 @@ if [ -z "${BOOST_DIR}" ]; then
     fi
 )
     
-    if (( $? )); then
-        echo 'BEGIN ERROR'
-        echo 'Error while building Boost. Aborting.'
-        echo 'END ERROR'
-        exit 1
-    fi
+#    if (( $? )); then
+#        echo 'BEGIN ERROR'
+#        echo 'Error while building Boost. Aborting.'
+#        echo 'END ERROR'
+#        exit 1
+#    fi
     
 fi
 
