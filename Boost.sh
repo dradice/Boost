@@ -6,7 +6,7 @@
 
 # Set up shell
 set -x                          # Output commands
-#set -e                          # Abort on errors
+set -e                          # Abort on errors
 
 
 
@@ -97,10 +97,10 @@ if [ -z "${BOOST_DIR}" ]; then
         ./bootstrap.sh --prefix=${BOOST_DIR}
         
         echo "Boost: Building..."
-        ./b2
+        ./b2 || true
         
         echo "Boost: Installing..."
-        ./b2 install
+        ./b2 install || true
         popd
         
         echo "Boost: Cleaning up..."
@@ -111,12 +111,12 @@ if [ -z "${BOOST_DIR}" ]; then
     fi
 )
     
-#    if (( $? )); then
-#        echo 'BEGIN ERROR'
-#        echo 'Error while building Boost. Aborting.'
-#        echo 'END ERROR'
-#        exit 1
-#    fi
+    if (( $? )); then
+        echo 'BEGIN ERROR'
+        echo 'Error while building Boost. Aborting.'
+        echo 'END ERROR'
+        exit 1
+    fi
     
 fi
 
