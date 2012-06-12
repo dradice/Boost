@@ -2,7 +2,7 @@
 
 PROVIDES Boost
 {
-  SCRIPT Boost.sh
+  SCRIPT configure.sh
   LANG bash
   OPTIONS BOOST_DIR
 }
