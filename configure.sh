@@ -69,7 +69,7 @@ if [ -z "${BOOST_DIR}" ]; then
     set -e                      # Abort on errors
     cd ${SCRATCH_BUILD}
     if [ -e ${DONE_FILE} -a ${DONE_FILE} -nt ${SRCDIR}/dist/${NAME}.tar.gz \
-                         -a ${DONE_FILE} -nt ${SRCDIR}/Boost.sh ]
+                         -a ${DONE_FILE} -nt ${SRCDIR}/configure.sh ]
     then
         echo "Boost: The enclosed Boost library has already been built; doing nothing"
     else
