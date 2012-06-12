@@ -5,10 +5,8 @@
 ################################################################################
 
 # Set up shell
-set -x                          # Output commands
+#set -x                          # Output commands
 set -e                          # Abort on errors
-
-
 
 ################################################################################
 # Search
@@ -18,8 +16,8 @@ if [ -z "${BOOST_DIR}" ]; then
     echo "BEGIN MESSAGE"
     echo "Boost selected, but BOOST_DIR not set. Checking some places..."
     echo "END MESSAGE"
-    
-    FILES="include/boost/array.hpp"
+
+    FILES="include/boost/array.hpp include/boost/preprocessor/repetition/repeat.hpp include/boost/math/special_functions/gamma.hpp"
     DIRS="/usr /usr/local /usr/local/boost /usr/local/packages/boost /usr/local/apps/boost ${HOME} c:/packages/boost"
     for dir in $DIRS; do
         BOOST_DIR="$dir"
@@ -33,7 +31,7 @@ if [ -z "${BOOST_DIR}" ]; then
             break
         fi
     done
-    
+
     if [ -z "$BOOST_DIR" ]; then
         echo "BEGIN MESSAGE"
         echo "Boost not found"
@@ -55,7 +53,7 @@ if [ -z "${BOOST_DIR}" ]; then
     echo "BEGIN MESSAGE"
     echo "Building Boost..."
     echo "END MESSAGE"
-    
+
     # Set locations
     THORN=Boost
     NAME=boost_1_47_0
@@ -64,7 +62,7 @@ if [ -z "${BOOST_DIR}" ]; then
     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
     DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
     BOOST_DIR=${INSTALL_DIR}
-    
+
 (
     exec >&2                    # Redirect stdout to stderr
     set -x                      # Output commands
@@ -76,48 +74,48 @@ if [ -z "${BOOST_DIR}" ]; then
         echo "Boost: The enclosed Boost library has already been built; doing nothing"
     else
         echo "Boost: Building enclosed Boost library"
-        
+
         # Set up environment
         unset LIBS
         if echo '' ${ARFLAGS} | grep 64 > /dev/null 2>&1; then
             export OBJECT_MODE=64
         fi
-        
+
         echo "Boost: Preparing directory structure..."
         mkdir build external done 2> /dev/null || true
         rm -rf ${BUILD_DIR} ${INSTALL_DIR}
         mkdir ${BUILD_DIR} ${INSTALL_DIR}
-        
+
         echo "Boost: Unpacking archive..."
         pushd ${BUILD_DIR}
         ${TAR} xzf ${SRCDIR}/dist/${NAME}.tar.gz
-        
+
         echo "Boost: Configuring..."
         cd ${NAME}
         ./bootstrap.sh --prefix=${BOOST_DIR}
-        
+
         echo "Boost: Building..."
         ./b2 || true
-        
+
         echo "Boost: Installing..."
         ./b2 install || true
         popd
-        
+
         echo "Boost: Cleaning up..."
         rm -rf ${BUILD_DIR}
-        
+
         date > ${DONE_FILE}
         echo "Boost: Done."
     fi
 )
-    
+
     if (( $? )); then
         echo 'BEGIN ERROR'
         echo 'Error while building Boost. Aborting.'
         echo 'END ERROR'
         exit 1
     fi
-    
+
 fi
 
 
