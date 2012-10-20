@@ -56,7 +56,7 @@ if [ -z "${BOOST_DIR}" ]; then
 
     # Set locations
     THORN=Boost
-    NAME=boost_1_50_0
+    NAME=boost_1_51_0
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
