@@ -12,7 +12,9 @@ set -e                          # Abort on errors
 # Search
 ################################################################################
 
-if [ -z "${BOOST_DIR}" ]; then
+if [ -z "${BOOST_DIR}"                                                  \
+     -o "$(echo "${BOOST_DIR}" | tr '[a-z]' '[A-Z]')" = 'NO_BUILD' ]
+then
     echo "BEGIN MESSAGE"
     echo "Boost selected, but BOOST_DIR not set. Checking some places..."
     echo "END MESSAGE"
@@ -49,7 +51,9 @@ fi
 # Build
 ################################################################################
 
-if [ -z "${BOOST_DIR}" ]; then
+if [ -z "${BOOST_DIR}"                                                  \
+     -o "$(echo "${BOOST_DIR}" | tr '[a-z]' '[A-Z]')" = 'BUILD' ]
+then
     echo "BEGIN MESSAGE"
     echo "Building Boost..."
     echo "END MESSAGE"
