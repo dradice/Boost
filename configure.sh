@@ -130,12 +130,15 @@ fi
 ################################################################################
 
 # Set options
-BOOST_INC_DIRS="${BOOST_DIR}/include"
-
-if [ -d ${BOOST_DIR}/lib64 ]; then
-    BOOST_LIB_DIRS="${BOOST_DIR}/lib64"
+if [ "${BOOST_DIR}" = '/usr' -o "${BOOST_DIR}" = '/usr/local' ]; then
+    :                           # do nothing
 else
-    BOOST_LIB_DIRS="${BOOST_DIR}/lib"
+    BOOST_INC_DIRS="${BOOST_DIR}/include"
+    if [ -d ${BOOST_DIR}/lib64 ]; then
+        BOOST_LIB_DIRS="${BOOST_DIR}/lib64"
+    else
+        BOOST_LIB_DIRS="${BOOST_DIR}/lib"
+    fi
 fi
 
 # BOOST_LIBS='boost'
