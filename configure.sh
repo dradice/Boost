@@ -12,7 +12,9 @@ set -e                          # Abort on errors
 # Search
 ################################################################################
 
-if [ -z "${BOOST_DIR}" ]; then
+if [ -z "${BOOST_DIR}"                                                  \
+     -o "$(echo "${BOOST_DIR}" | tr '[a-z]' '[A-Z]')" = 'NO_BUILD' ]
+then
     echo "BEGIN MESSAGE"
     echo "Boost selected, but BOOST_DIR not set. Checking some places..."
     echo "END MESSAGE"
@@ -49,14 +51,16 @@ fi
 # Build
 ################################################################################
 
-if [ -z "${BOOST_DIR}" ]; then
+if [ -z "${BOOST_DIR}"                                                  \
+     -o "$(echo "${BOOST_DIR}" | tr '[a-z]' '[A-Z]')" = 'BUILD' ]
+then
     echo "BEGIN MESSAGE"
     echo "Building Boost..."
     echo "END MESSAGE"
 
     # Set locations
     THORN=Boost
-    NAME=boost_1_50_0
+    NAME=boost_1_52_0
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
@@ -88,7 +92,7 @@ if [ -z "${BOOST_DIR}" ]; then
 
         echo "Boost: Unpacking archive..."
         pushd ${BUILD_DIR}
-        ${TAR} xzf ${SRCDIR}/dist/${NAME}.tar.gz
+        ${TAR?} xzf ${SRCDIR}/dist/${NAME}.tar.gz
 
         echo "Boost: Configuring..."
         cd ${NAME}
@@ -126,12 +130,15 @@ fi
 ################################################################################
 
 # Set options
-BOOST_INC_DIRS="${BOOST_DIR}/include"
-
-if [ -d ${BOOST_DIR}/lib64 ]; then
-    BOOST_LIB_DIRS="${BOOST_DIR}/lib64"
+if [ "${BOOST_DIR}" = '/usr' -o "${BOOST_DIR}" = '/usr/local' ]; then
+    :                           # do nothing
 else
-    BOOST_LIB_DIRS="${BOOST_DIR}/lib"
+    BOOST_INC_DIRS="${BOOST_DIR}/include"
+    if [ -d ${BOOST_DIR}/lib64 ]; then
+        BOOST_LIB_DIRS="${BOOST_DIR}/lib64"
+    else
+        BOOST_LIB_DIRS="${BOOST_DIR}/lib"
+    fi
 fi
 
 if [ -z "$BOOST_LIBS" ]; then
