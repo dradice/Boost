@@ -134,8 +134,9 @@ else
     BOOST_LIB_DIRS="${BOOST_DIR}/lib"
 fi
 
-# BOOST_LIBS='boost'
-# BOOST_LIBS="boost_date_time boost_filesystem boost_iostreams boost_prg_exec_monitor boost_program_options boost_python boost_regex boost_serialization boost_signals boost_test_exec_monitor boost_thread boost_unit_test_framework boost_wave boost_wserialization"
+if [ -z "$BOOST_LIBS" ]; then
+    BOOS_LIBS="boost_filesystem"
+fi
 
 # Pass options to Cactus
 echo "BEGIN MAKE_DEFINITION"
