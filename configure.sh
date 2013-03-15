@@ -100,10 +100,10 @@ then
         ./bootstrap.sh --prefix=${BOOST_DIR} --without-libraries=mpi
 
         echo "Boost: Building..."
-        ./b2 || true
+        ./b2 link=static || true
 
         echo "Boost: Installing..."
-        ./b2 install || true
+        ./b2 install link=static || true
         popd
 
         echo "Boost: Cleaning up..."
