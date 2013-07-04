@@ -58,7 +58,7 @@ then
 
     # Set locations
     THORN=Boost
-    NAME=boost_1_53_0
+    NAME=boost_1_54_0
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
