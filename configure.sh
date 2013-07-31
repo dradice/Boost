@@ -6,7 +6,7 @@
 
 # Set up shell
 #set -x                          # Output commands
-set -e                          # Abort on errors
+#set -e                          # Abort on errors
 
 ################################################################################
 # Search
@@ -118,7 +118,6 @@ then
         echo 'END ERROR'
         exit 1
     fi
-
 fi
 
 
