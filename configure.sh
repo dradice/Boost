@@ -5,8 +5,10 @@
 ################################################################################
 
 # Set up shell
-#set -x                          # Output commands
-#set -e                          # Abort on errors
+if [ "$(echo ${VERBOSE} | tr '[:upper:]' '[:lower:]')" = 'yes' ]; then
+    set -x                      # Output commands
+fi
+set -e                          # Abort on errors
 
 ################################################################################
 # Search
@@ -61,22 +63,37 @@ then
     NAME=boost_1_54_0
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
-    INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
+    if [ -z "${HDF5_INSTALL_DIR}" ]; then
+        INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
+    else
+        echo "BEGIN MESSAGE"
+        echo "Installing Boost into ${BOOST_INSTALL_DIR}"
+        echo "END MESSAGE"
+        INSTALL_DIR=${BOOST_INSTALL_DIR}
+    fi
     DONE_FILE=${SCRATCH_BUILD}/done/${THORN}
     BOOST_DIR=${INSTALL_DIR}
-
-(
-    exec >&2                    # Redirect stdout to stderr
-    set -x                      # Output commands
-    set -e                      # Abort on errors
-    cd ${SCRATCH_BUILD}
+    
     if [ -e ${DONE_FILE} -a ${DONE_FILE} -nt ${SRCDIR}/dist/${NAME}.tar.gz \
                          -a ${DONE_FILE} -nt ${SRCDIR}/configure.sh ]
     then
-        echo "Boost: The enclosed Boost library has already been built; doing nothing"
+        echo "BEGIN MESSAGE"
+        echo "Boost has already been built; doing nothing"
+        echo "END MESSAGE"
     else
-        echo "Boost: Building enclosed Boost library"
-
+        echo "BEGIN MESSAGE"
+        echo "Building Boost"
+        echo "END MESSAGE"
+        
+        # Build in a subshell
+        (
+        exec >&2                # Redirect stdout to stderr
+        if [ "$(echo ${VERBOSE} | tr '[:upper:]' '[:lower:]')" = 'yes' ]; then
+            set -x              # Output commands
+        fi
+        set -e                  # Abort on errors
+        cd ${SCRATCH_BUILD}
+        
         # Set up environment
         unset LIBS
         if echo '' ${ARFLAGS} | grep 64 > /dev/null 2>&1; then
@@ -109,15 +126,16 @@ then
 
         date > ${DONE_FILE}
         echo "Boost: Done."
+        )
+        
+        if (( $? )); then
+            echo 'BEGIN ERROR'
+            echo 'Error while building Boost. Aborting.'
+            echo 'END ERROR'
+            exit 1
+        fi
     fi
-)
-
-    if (( $? )); then
-        echo 'BEGIN ERROR'
-        echo 'Error while building Boost. Aborting.'
-        echo 'END ERROR'
-        exit 1
-    fi
+    
 fi
 
 
