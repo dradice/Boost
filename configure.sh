@@ -63,7 +63,7 @@ then
     NAME=boost_1_54_0
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
-    if [ -z "${HDF5_INSTALL_DIR}" ]; then
+    if [ -z "${BOOST_INSTALL_DIR}" ]; then
         INSTALL_DIR=${SCRATCH_BUILD}/external/${THORN}
     else
         echo "BEGIN MESSAGE"
