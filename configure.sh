@@ -157,7 +157,7 @@ else
 fi
 
 if [ -z "${BOOST_LIBS}" ]; then
-    BOOST_LIBS="boost_filesystem"
+    BOOST_LIBS="boost_filesystem boost_system"
 fi
 
 # Pass options to Cactus
