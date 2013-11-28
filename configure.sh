@@ -60,7 +60,8 @@ then
 
     # Set locations
     THORN=Boost
-    NAME=boost_1_54_0
+    #NAME=boost_1_54_0
+    NAME=boost_1_55_0
     SRCDIR=$(dirname $0)
     BUILD_DIR=${SCRATCH_BUILD}/build/${THORN}
     if [ -z "${BOOST_INSTALL_DIR}" ]; then
@@ -112,13 +113,18 @@ then
         echo "Boost: Configuring..."
         cd ${NAME}
         # Could also build with MPI instead
-        ./bootstrap.sh --prefix=${BOOST_DIR} --without-libraries=mpi
+        #./bootstrap.sh --prefix=${BOOST_DIR} --without-mpi
+        # Could also make MPI dependency optional
+        echo 'using mpi ;' > user-config.jam
+        ./bootstrap.sh --prefix=${BOOST_DIR}
 
         echo "Boost: Building..."
         ./b2 link=static || true
+        #./b2 || true
 
         echo "Boost: Installing..."
         ./b2 install link=static || true
+        #./b2 install || true
         popd
 
         echo "Boost: Cleaning up..."
